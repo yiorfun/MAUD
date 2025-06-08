@@ -1,6 +1,6 @@
-##########################
-### SIMULATION STUDIES ###
-##########################
+####################################################################
+### SIMULATION STUDIES     						                 ###
+####################################################################
 
 ############################
 ### Loading the packages ###
@@ -435,35 +435,35 @@ SOLVING_MMRM_MODEL <- function(XT_mat, Y_mat, divided_by, n, p_vector, structure
 	return(list(B_EST_MMRM = B_EST_MMRM, SE_B_MMRM = SE_B_MMRM, Sigma_EST_MMRM = Sigma_EST_MMRM))
 }
 
-SOLVING_GLMM_MODEL <- function(XT_mat, YT_mat){
+SOLVING_MLRM_MODEL <- function(XT_mat, YT_mat){
 
 	RES_GLM_REG <- lm(YT_mat ~ - 1 + XT_mat)
 	SSCPE <- crossprod(YT_mat - RES_GLM_REG$fitted.values)
 	SigmaHat <- SSCPE / (nrow(YT_mat) - nrow(coef(RES_GLM_REG)))
-	### in our setting, GLMM assumes a diagonal covariance matrix
+	### in our setting, MLRM assumes a diagonal covariance matrix
 	return(diag(diag(SigmaHat)))
 }
 
-#########################################
-### Setting the dependence parameters ###
-#########################################
+####################################
+### Setting the model parameters ###
+####################################
 
 SET_NO <- 1
 
 SET_UP <- matrix(c(
-		   100, 3, 10, 1.8,  NA, 0, 1e3, 2023,  ### study 1
-		   200, 3, 10, 1.8,  NA, 0, 1e3, 2023,  ### study 1
-		   300, 3, 10, 1.8,  NA, 0, 1e3, 2023,  ### study 1
-		   100, 5,  5, 1.8,  NA, 0, 1e3, 2023,  ### study 1
-		   200, 5,  5, 1.8,  NA, 0, 1e3, 2023,  ### study 1
-		   300, 5,  5, 1.8,  NA, 0, 1e3, 2023,  ### study 1
-			50, 3, 10, 1.8, 100, 0, 1e3, 2023,  ### study 2
-			50, 3, 15, 1.8, 100, 0, 1e3, 2023,  ### study 2
-			50, 3, 20, 1.8, 100, 0, 1e3, 2023,  ### study 2	
-			50, 4, 10, 1.8, 100, 0, 1e3, 2023,  ### study 2	
-			50, 4, 15, 1.8, 100, 0, 1e3, 2023,  ### study 2	
-			50, 4, 20, 1.8, 100, 0, 1e3, 2023,  ### study 2	
-			50, 3, 10, 1.8, 100, 1, 1e3, 2023   ### study 3
+		   100, 3, 10, 1.8,  NA, 0, 1e3, 2025,  ### study 1
+		   200, 3, 10, 1.8,  NA, 0, 1e3, 2025,  ### study 1
+		   300, 3, 10, 1.8,  NA, 0, 1e3, 2025,  ### study 1
+		   100, 5,  5, 1.8,  NA, 0, 1e3, 2025,  ### study 1
+		   200, 5,  5, 1.8,  NA, 0, 1e3, 2025,  ### study 1
+		   300, 5,  5, 1.8,  NA, 0, 1e3, 2025,  ### study 1
+			50, 3, 10, 1.8, 100, 0, 1e3, 2025,  ### study 2
+			50, 3, 15, 1.8, 100, 0, 1e3, 2025,  ### study 2
+			50, 3, 20, 1.8, 100, 0, 1e3, 2025,  ### study 2	
+			50, 4, 10, 1.8, 100, 0, 1e3, 2025,  ### study 2	
+			50, 4, 15, 1.8, 100, 0, 1e3, 2025,  ### study 2	
+			50, 4, 20, 1.8, 100, 0, 1e3, 2025,  ### study 2	
+			50, 3, 10, 1.8, 100, 1, 1e3, 2025   ### study 3
 		), nrow = 13, ncol = 8, byrow = TRUE)
 ### cols: sample size, G, multiple, kappa, sigma_min, eps, reps_max, model_seed
 
@@ -610,7 +610,6 @@ OUTPUT_ADDRESS <- "..."
 reps <- 1
 iters_max <- 1e2
 ### the number of initial values for each estimate of gamma_0
-set.seed(model_seed)
 
 STUDY_1_NO <- 1 : 6
 gamma_MCMC_MAT <- matrix(0, nrow = reps_max, ncol = dim_gamma)
@@ -619,16 +618,16 @@ PHI_gamma_AASY_1 <- PHI_gamma_AASY_2 <- PHI_gamma_AASY_3 <- matrix(0, nrow = rep
 ### a matrix contains the triangle elements of asy. covariance matrix 
 gamma_EWCP_MAT_1 <- gamma_EWCP_MAT_2 <- gamma_EWCP_MAT_3 <- matrix(0, nrow = reps_max, ncol = dim_gamma)
 ### a matrix contains if the 95% empirical Wald-type CI includes the true
-beta_RB_vec <- rep(0, reps_max)
-### the relative bias 
+beta_est_vec <- rep(0, length(beta_0))
+### the estimate of beta
 
 STUDY_2_NO <- 7 : 12
 p_adj_method <- "BH"
 ### how to adjust the p-values
 decision_mat <- matrix(0, nrow = R * 1, ncol = 5)
-colnames(decision_mat) <- c("TRUE", "MAUD", "AMBD", "MMRM", "GLMM")
+colnames(decision_mat) <- c("TRUE", "MAUD", "AMBD", "MMRM", "MLRM")
 loss_mat_F <- loss_mat_S <- matrix(0, nrow = reps_max, ncol = 5)
-colnames(loss_mat_F) <- colnames(loss_mat_S) <- c("TRUE", "MAUD", "AMBD", "MMRM", "GLMM")
+colnames(loss_mat_F) <- colnames(loss_mat_S) <- c("TRUE", "MAUD", "AMBD", "MMRM", "MLRM")
 computing_time_mat <- matrix(0, nrow = reps_max, ncol = 5)
 
 STUDY_3_NO <- 13
@@ -641,6 +640,7 @@ colnames(mis_loss_mat_F) <- colnames(mis_loss_mat_S) <- c("sig_0", "sig_3", "sig
 #################################
 
 start_time <- Sys.time()
+set.seed(model_seed)
 
 while(reps <= reps_max){
 
@@ -810,8 +810,8 @@ while(reps <= reps_max){
 			}
 			
 			
-			### 1-4 computing the relative bias for beta
-			beta_RB_vec[reps] <- norm(beta_OLS - beta_0, "2") /  norm(beta_0, "2")
+			### 1-4 computing the bias for beta
+			beta_est_vec <- beta_est_vec + beta_OLS
 		
 		} else if(SET_NO %in% STUDY_2_NO){
 
@@ -892,15 +892,15 @@ while(reps <= reps_max){
 			decision_mat[, 4] <- decision_mat[, 4] + as.vector((p.adjust(2 * (1 - pt(abs(T_Beta_MMRM[, 2]), df = n - 1)), method = p_adj_method) < sig_level) * 1)
 			computing_time_mat[reps, 4] <- Sys.time() - time_start_MMRM
 			
-			### 5 GLMM ###
-			time_start_GLMM <- Sys.time()
-			Sigma_EST_GLMM <- SOLVING_GLMM_MODEL(XT_mat, YT_mat)
-			COV_beta_EST_GLMM <- kronecker(Sigma_EST_GLMM, inv_x_sum_mat)
-			loss_mat_F[reps, 5] <- norm(COV_beta_EST_GLMM - COV_beta_0, "F") / norm(COV_beta_0, "F")
-			loss_mat_S[reps, 5] <- norm(COV_beta_EST_GLMM - COV_beta_0, "2") / norm(COV_beta_0, "2")
-			T_Beta_GLMM <- matrix(beta_OLS / sqrt(diag(COV_beta_EST_GLMM)), nrow = R, ncol = p, byrow = TRUE) 
-			decision_mat[, 5] <- decision_mat[, 5] + as.vector((p.adjust(2 * (1 - pt(abs(T_Beta_GLMM[, 2]), df = n - 1)), method = p_adj_method) < sig_level) * 1)
-			computing_time_mat[reps, 5] <- Sys.time() - time_start_GLMM
+			### 5 MLRM ###
+			time_start_MLRM <- Sys.time()
+			Sigma_EST_MLRM <- SOLVING_MLRM_MODEL(XT_mat, YT_mat)
+			COV_beta_EST_MLRM <- kronecker(Sigma_EST_MLRM, inv_x_sum_mat)
+			loss_mat_F[reps, 5] <- norm(COV_beta_EST_MLRM - COV_beta_0, "F") / norm(COV_beta_0, "F")
+			loss_mat_S[reps, 5] <- norm(COV_beta_EST_MLRM - COV_beta_0, "2") / norm(COV_beta_0, "2")
+			T_Beta_MLRM <- matrix(beta_OLS / sqrt(diag(COV_beta_EST_MLRM)), nrow = R, ncol = p, byrow = TRUE) 
+			decision_mat[, 5] <- decision_mat[, 5] + as.vector((p.adjust(2 * (1 - pt(abs(T_Beta_MLRM[, 2]), df = n - 1)), method = p_adj_method) < sig_level) * 1)
+			computing_time_mat[reps, 5] <- Sys.time() - time_start_MLRM
 			
 		} else if(SET_NO %in% STUDY_3_NO){
 			
@@ -974,28 +974,24 @@ if(SET_NO %in% STUDY_1_NO){
 	gamma_AASY_1 <- apply(apply(PHI_gamma_AASY_1, 1, function(x) sqrt(diag(matlib::symMat(x, diag = TRUE, byrow = FALSE)))), 1, mean)
 	gamma_EWCP_1 <- apply(gamma_EWCP_MAT_1, 2, mean)
 	
-	gamma_AASY_2 <- apply(apply(PHI_gamma_AASY_2, 1, function(x) sqrt(diag(matlib::symMat(x, diag = TRUE, byrow = FALSE)))), 1, mean)
-	gamma_EWCP_2 <- apply(gamma_EWCP_MAT_2, 2, mean)
-	gamma_AASY_3 <- apply(apply(PHI_gamma_AASY_3, 1, function(x) sqrt(diag(matlib::symMat(x, diag = TRUE, byrow = FALSE)))), 1, mean)
-	gamma_EWCP_3 <- apply(gamma_EWCP_MAT_3, 2, mean)
+	gamma_AASY_2 <- apply(apply(PHI_gamma_AASY_2, 1, function(x) sqrt(diag(matlib::symMat(x, diag = TRUE, byrow = FALSE)))), 1, mean, na.rm = TRUE)
+	gamma_EWCP_2 <- apply(gamma_EWCP_MAT_2, 2, mean, na.rm = TRUE)
+	gamma_AASY_3 <- apply(apply(PHI_gamma_AASY_3, 1, function(x) sqrt(diag(matlib::symMat(x, diag = TRUE, byrow = FALSE)))), 1, mean, na.rm = TRUE)
+	gamma_EWCP_3 <- apply(gamma_EWCP_MAT_3, 2, mean, na.rm = TRUE)
 	
 	print(round(cbind(gamma_BIAS, gamma_MCSD, gamma_AASY_1, gamma_EWCP_1, gamma_AASY_2, gamma_EWCP_2, gamma_AASY_3, gamma_EWCP_3) * 100, 2))
 	
-	print(c(mean(beta_RB_vec), sd(beta_RB_vec)))
+	print(norm(beta_est_vec / reps_max - beta_0, "2"))
 
 } else if(SET_NO %in% STUDY_2_NO){
-
-	cbind(Beta_0[, 2], decision_mat / reps_max)
-	### first non-zero: empirical powers
-	### first zero: empirical sizes
 
 	PLOT_DATA <- as.data.frame(cbind(
 	c(loss_mat_F[, 2], loss_mat_F[, 3], loss_mat_F[, 4], loss_mat_F[, 5],
 	  loss_mat_S[, 2], loss_mat_S[, 3], loss_mat_S[, 4], loss_mat_S[, 5]), 	
-	c(rep("MAUD", reps_max), rep("AMBD", reps_max), rep("MMRM", reps_max), rep("GLMM", reps_max), rep("MAUD", reps_max), rep("AMBD", reps_max), rep("MMRM", reps_max), rep("GLMM", reps_max)),
+	c(rep("MAUD", reps_max), rep("AMBD", reps_max), rep("MMRM", reps_max), rep("MLRM", reps_max), rep("MAUD", reps_max), rep("AMBD", reps_max), rep("MMRM", reps_max), rep("MLRM", reps_max)),
 	c(rep("Frobenius Norm", 4 * reps_max), rep("Spectral Norm", 4 * reps_max))))
 	PLOT_DATA[, 1] <- as.numeric(PLOT_DATA[, 1])
-	PLOT_DATA[, 2] <- factor(PLOT_DATA[, 2], levels = c("MAUD", "AMBD", "MMRM", "GLMM"))
+	PLOT_DATA[, 2] <- factor(PLOT_DATA[, 2], levels = c("MAUD", "AMBD", "MMRM", "MLRM"))
 	colnames(PLOT_DATA) <- c("relative_loss", "method", "norm")
 
 	font_scale <- 20
@@ -1018,11 +1014,14 @@ if(SET_NO %in% STUDY_1_NO){
 	ylab("Relative Loss") + 
 	theme(text = element_text(size = font_scale)) 
 	dev.off()
-
-	print(apply(computing_time_mat, 2, sum))
+	
+	print(cbind(Beta_0[, 2], decision_mat / reps_max))
+	### first non-zero: empirical powers
+	### first zero: empirical sizes
+	
 	print(apply(computing_time_mat, 2, mean))
 	print(apply(computing_time_mat, 2, sd))
-    ### TRUE, MAUD, AMBD, MMRM, GLMM
+    ### TRUE, MAUD, AMBD, MMRM, MLRM
 	
 } else if(SET_NO %in% STUDY_3_NO){
 
@@ -1032,7 +1031,7 @@ if(SET_NO %in% STUDY_1_NO){
 	c(rep("Frobenius Norm", 4 * reps_max), rep("Spectral Norm", 4 * reps_max))))
 	MIS_PLOT_DATA[, 1] <- as.numeric(MIS_PLOT_DATA[, 1])
 	MIS_PLOT_DATA[, 2] <- factor(MIS_PLOT_DATA[, 2], levels = c("0 level", "3 level", "6 level", "9 level"))
-	colnames(MIS_PLOT_DATA) <- c("relative_loss", "method", "norm")
+	colnames(MIS_PLOT_DATA) <- c("relative_loss", "noise", "norm")
 
 	font_scale <- 20
 	plot_size_in <- 6
@@ -1045,7 +1044,7 @@ if(SET_NO %in% STUDY_1_NO){
 	ggplot2::ggplot(data = MIS_PLOT_DATA, 
 				 mapping = aes(x = norm, 
 							   y = relative_loss, 
-							fill = method)) +
+							fill = noise)) +
 	geom_boxplot() +
 	theme_bw() + 
 	#theme(legend.position.inside = "top", legend.justification = "right") +
