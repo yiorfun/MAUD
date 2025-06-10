@@ -7,8 +7,8 @@
 ############################
 
 REQUIRED_PACKAGES <- c(
-	"mvnfast",		
-	### mvnfast::rmvn(), fast generate multivariate normal samples
+	"MASS",		
+	### MASS::mvrnorm(), generate multivariate normal samples
 	"matlib", 
 	### matlib::symMat(), create a symmetric matrix from a vector
     "ICONS"
@@ -93,7 +93,7 @@ S_mat_est_ICONS <- result_ICONS$W_dense
 ### note that the diagonals are zero
 diag(S_mat_est_ICONS) <- diag(S_perm_mat)[result_ICONS$Clist]
 
-OUTPUT_ADDRESS <- "C:/Users/yxy1423/Documents/R Working Directory File/MAUD_Output/"
+OUTPUT_ADDRESS <- "..."
 ### the default output address
 
 plotMatrix(z = Sigma_0, cex.axis = 1.3, cex.lab = 1.3, save.image = T, filepath = paste(OUTPUT_ADDRESS, "SM_Sigma_0.pdf", sep = ""), format = "pdf")
@@ -107,3 +107,5 @@ plotMatrix(z = S_mat_est_kmeans, cex.axis = 1.3, cex.lab = 1.3, save.image = T, 
 plotMatrix(z = S_mat_est_ICONS, cex.axis = 1.3, cex.lab = 1.3, save.image = T, filepath = paste(OUTPUT_ADDRESS, "SM_S_mat_est_ICONS.pdf", sep = ""), format = "pdf")
 ### heatmap of sample covariance matrix based permuted covariates
 
+FILENAME <- paste("SUPPLEMENTARY_MATERIAL", ".RData", sep = "")
+save.image(paste(OUTPUT_ADDRESS, FILENAME, sep = "/"))
